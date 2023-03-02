@@ -28,9 +28,17 @@ FriendlyEats.prototype.getAllRestaurants = function(renderer) {
 };
 
 FriendlyEats.prototype.getDocumentsInQuery = function(query, renderer) {
-  /*
-    TODO: Render all documents in the provided query
-  */
+  query.onSnapshot(function(snapshot) {
+    if (!snapshot.size) return renderer.empty(); // Display "There are no restaurants".
+
+    snapshot.docChanges().forEach(function(change) {
+      if (change.type === 'removed') {
+        renderer.remove(change.doc);
+      } else {
+        renderer.display(change.doc);
+      }
+    });
+  });
 };
 
 FriendlyEats.prototype.getRestaurant = function(id) {
