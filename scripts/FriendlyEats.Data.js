@@ -28,10 +28,31 @@ FriendlyEats.prototype.getAllRestaurants = function(renderer) {
 };
 
 FriendlyEats.prototype.getDocumentsInQuery = function(query, renderer) {
-  /*
-    TODO: Render all documents in the provided query
-  */
+  query.onSnapshot(function(snapshot) {
+    if (!snapshot.size) return renderer.empty(); // Display "There are no restaurants".
+
+    snapshot.docChanges().forEach(function(change) {
+      if (change.type === 'removed') {
+        renderer.remove(change.doc);
+      } else {
+        renderer.display(change.doc);
+      }
+    });
+  });
 };
+In the code above, query.onSnapshot will trigger its callback every time there's a change to the result of the query.
+
+The first time, the callback is triggered with the entire result set of the query – meaning the whole restaurants collection from Cloud Firestore. It then passes all the individual documents to the renderer.display function.
+When a document is deleted, change.type equals to removed. So in this case, we'll call a function that removes the restaurant from the UI.
+Now that we've implemented both methods, refresh the app and verify that the restaurants we saw earlier in the Firebase console are now visible in the app. If you completed this section successfully, then your app is now reading and writing data with Cloud Firestore!
+
+As your list of restaurants changes, this listener will keep updating automatically. Try going to the Firebase console and manually deleting a restaurant or changing its name - you'll see the changes show up on your site immediately!
+
+Note: It's also possible to fetch documents from Cloud Firestore once, rather than listening for real time updates using the Query.get() method.
+
+img5.png
+
+Back
 
 FriendlyEats.prototype.getRestaurant = function(id) {
   /*
